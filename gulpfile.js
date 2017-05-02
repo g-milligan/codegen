@@ -31,7 +31,7 @@ var jsFiles={
     './js/app/plugins/reloadWindow.js'
   ],
   './dist/js/config.js':[
-    './js/custom/config.js'
+    './custom/config/three.js' //swap this out with different config files
   ]
 };
 

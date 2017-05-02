@@ -760,6 +760,18 @@ var customControls=(function(){
 
               if(args.hasOwnProperty('save_in_folder')){
                 args['type']='datalist';
+                //correct the order of the ajax-loaded element
+                var correctAjaxDisruptedOrder=function(ccw){
+                  //make sure this ccw appears in the right order
+                  var ccwIndex=ccw.attr('data-index'); ccwIndex=parseInt(ccwIndex);
+                  if(ccwIndex!==ccw.index()){
+                    if(ccwIndex===0){
+                      ccw.parent().prepend(ccw); //move first
+                    }else{
+                      ccw.parent().children().eq(ccwIndex-1).after(ccw); //move after some other previous index
+                    }
+                  }
+                };
                 //get the saved files in this path
                 ajaxPost('/browse-files', {path:args['save_in_folder'], prefix:['_'], ext:['json']}, function(ar){
                   //get options for projects json files already saved in the file system
@@ -774,15 +786,7 @@ var customControls=(function(){
                   var ccw=buildHtml(index);
                   ccw.addClass('save-in-folder');
                   ccw.find('.val:first').addClass('save-in-folder');
-                  //make sure this ccw appears in the right order
-                  var ccwIndex=ccw.attr('data-index'); ccwIndex=parseInt(ccwIndex);
-                  if(ccwIndex!==ccw.index()){
-                    if(ccwIndex===0){
-                      ccw.parent().prepend(ccw); //move first
-                    }else{
-                      ccw.parent().children().eq(ccwIndex-1).after(ccw); //move after some other previous index
-                    }
-                  }
+                  correctAjaxDisruptedOrder(ccw);
                   //finish up delayed init
                   ccw.find('.children').each(function(){
                     self['updateChildGroupCount'](jQuery(this));
@@ -791,7 +795,8 @@ var customControls=(function(){
                   //init write configuration to .json file
                   self['initWriteConfigFileJson']({ccw:ccw, args:args, moreArgs:moreArgs});
                 },function(ar){
-                  buildHtml(index);
+                  var ccw=buildHtml(index);
+                  correctAjaxDisruptedOrder(ccw);
                 });
               }else{
                 buildHtml(index);
